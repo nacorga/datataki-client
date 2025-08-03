@@ -1,0 +1,10 @@
+*.tgz
+.npmrc
+.DS_Store
+/dist
+/node_modules
+/benchmark
+/coverage
+/test-results
+/playwright-report
+/tests/fixtures/tracelog.js

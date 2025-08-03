@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraceLog E2E Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="height: 1200px;">
+        <h1 data-testid="title">TraceLog E2E Test Page</h1>
+        <button
+            id="test-button"
+            data-testid="test-button"
+            data-tl-name="test_button"
+            data-tl-value="test_value">
+            Test Button
+        </button>
+
+        <button
+            id="custom-event-btn"
+            data-testid="custom-event-btn">
+            Send Custom Event
+        </button>
+
+        <button
+            id="empty-name-btn"
+            data-testid="empty-name-btn"
+            data-tl-name="">
+            Empty Name
+        </button>
+    </div>
+
+    <script type="module">
+        import { TraceLog } from './tracelog.js';
+        
+        async function initializeTraceLog() {
+            try {
+                await TraceLog.init({ id: 'test' });
+
+                console.log('TraceLog initialized successfully');
+                
+                document.getElementById('custom-event-btn')?.addEventListener('click', () => {
+                    try {
+                        TraceLog.event('playwright_event', { foo: 'bar' });
+                        console.log('Custom event sent successfully');
+                    } catch (error) {
+                        console.error('Error sending custom event:', error);
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing TraceLog:', error);
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeTraceLog);
+        } else {
+            initializeTraceLog();
+        }
+    </script>
+</body>
+</html> 
