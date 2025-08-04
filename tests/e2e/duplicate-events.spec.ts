@@ -6,7 +6,7 @@ test.describe('Duplicate Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -27,7 +27,7 @@ test.describe('Duplicate Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -50,7 +50,7 @@ test.describe('Duplicate Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });

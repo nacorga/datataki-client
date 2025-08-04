@@ -1,6 +1,4 @@
-import { ALLOWED_API_CONFIG_KEYS } from '../../app.constants';
 import { MetadataType } from '../../types/common.types';
-import { ApiConfig } from '../../types/config.types';
 
 // Security constants
 const MAX_STRING_LENGTH = 1000;
@@ -139,43 +137,6 @@ const sanitizeValue = (value: unknown, depth = 0): unknown => {
   }
 
   return null;
-};
-
-/**
- * Sanitizes API configuration data with strict validation
- * @param data - The API config data to sanitize
- * @returns The sanitized API config
- */
-export const sanitizeApiConfig = (data: unknown): ApiConfig => {
-  const safeData: Record<string, unknown> = {};
-
-  if (typeof data !== 'object' || data === null) {
-    return safeData;
-  }
-
-  try {
-    for (const key of Object.keys(data)) {
-      if (ALLOWED_API_CONFIG_KEYS.has(key as keyof ApiConfig)) {
-        const value = (data as Record<string, unknown>)[key];
-
-        if (key === 'excludedUrlPaths') {
-          const paths: string[] = Array.isArray(value) ? (value as string[]) : typeof value === 'string' ? [value] : [];
-
-          safeData.excludedUrlPaths = paths.map((path) => sanitizePathString(String(path))).filter(Boolean);
-        } else {
-          const sanitizedValue = sanitizeValue(value);
-
-          if (sanitizedValue !== null) {
-            safeData[key] = sanitizedValue;
-          }
-        }
-      }
-    }
-  } catch (error) {
-    throw new Error(`API config sanitization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
-
-  return safeData;
 };
 
 /**

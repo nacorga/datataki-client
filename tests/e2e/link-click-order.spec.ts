@@ -6,7 +6,7 @@ test.describe('Link Click Order - Demo Mode', () => {
     const eventOrder: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         if (msg.text().includes(`"type":"${EventType.CLICK}"`)) {
           eventOrder.push('CLICK');
         } else if (msg.text().includes(`"type":"${EventType.PAGE_VIEW}"`)) {
@@ -45,7 +45,7 @@ test.describe('Link Click Order - Demo Mode', () => {
     const eventOrder: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         if (msg.text().includes(`"type":"${EventType.CLICK}"`)) {
           eventOrder.push('CLICK');
         } else if (msg.text().includes(`"type":"${EventType.PAGE_VIEW}"`)) {
@@ -91,7 +91,7 @@ test.describe('Link Click Order - Demo Mode', () => {
     const eventOrder: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         if (msg.text().includes(`"type":"${EventType.CLICK}"`)) {
           eventOrder.push('CLICK');
         } else if (msg.text().includes(`"type":"${EventType.PAGE_VIEW}"`)) {

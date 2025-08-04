@@ -6,7 +6,7 @@ test.describe('Navigation - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -25,9 +25,9 @@ test.describe('Navigation - Demo Mode', () => {
     const clickLogs = consoleLogs.filter((log) => log.includes(`"type":"${EventType.CLICK}"`));
 
     expect(clickLogs).toHaveLength(1);
-    expect(clickLogs[0]).toContain(`[TraceLog] ${EventType.CLICK} event:`);
+    expect(clickLogs[0]).toContain(`[Datataki] ${EventType.CLICK} event:`);
 
-    const eventData = clickLogs[0].split(`[TraceLog] ${EventType.CLICK} event:`)[1];
+    const eventData = clickLogs[0].split(`[Datataki] ${EventType.CLICK} event:`)[1];
     const parsed = JSON.parse(eventData);
 
     expect(parsed.page_url).toBe('http://localhost:3000/second-page');

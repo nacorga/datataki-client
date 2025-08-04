@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org/'
-          scope: '@tracelog'
+          scope: '@datataki'
 
       - name: Install dependencies
         run: npm ci
@@ -130,10 +130,10 @@ jobs:
             **Install this RC version:**
             \`\`\`bash
             # Specific version
-            npm install @tracelog/client@${rcVersion}
+            npm install @datataki/client@${rcVersion}
             
             # Latest RC version (auto-updated)
-            npm install @tracelog/client@rc
+            npm install @datataki/client@rc
             \`\`\`
             
             ✨ **Each push to this PR will generate a new RC version automatically.**`;
@@ -252,5 +252,5 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "🧹 Cleaning up ALL RC versions for new release..."
           node scripts/rc-manager.js cleanup all || echo "No RC versions to clean"
-          npm dist-tag add @tracelog/client@$CURRENT_VERSION latest
+          npm dist-tag add @datataki/client@$CURRENT_VERSION latest
           echo "✅ Published version $CURRENT_VERSION as latest"

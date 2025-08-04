@@ -6,7 +6,7 @@ test.describe('Scroll Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -22,7 +22,7 @@ test.describe('Scroll Events - Demo Mode', () => {
     expect(scrollLogs.length).toBeGreaterThan(0);
 
     const scrollEvent = scrollLogs[0];
-    expect(scrollEvent).toContain(`[TraceLog] ${EventType.SCROLL} event:`);
+    expect(scrollEvent).toContain(`[Datataki] ${EventType.SCROLL} event:`);
     expect(scrollEvent).toContain('"type"');
     expect(scrollEvent).toContain('"timestamp"');
     expect(scrollEvent).toContain('"page_url"');

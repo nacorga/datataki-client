@@ -1,5 +1,5 @@
 import { SESSION_TIMEOUT_MS } from '../../app.constants';
-import { AppConfig, Config, ApiConfig } from '../../types/config.types';
+import { Config } from '../../types/config.types';
 
 /**
  * Configuration validation utilities
@@ -15,8 +15,8 @@ const VALIDATION_CONSTANTS = {
 } as const;
 
 const VALIDATION_MESSAGES = {
-  MISSING_PROJECT_ID: 'Project ID is required',
-  INVALID_PROJECT_ID: `Project ID must be between ${VALIDATION_CONSTANTS.MIN_PROJECT_ID_LENGTH} and ${VALIDATION_CONSTANTS.MAX_PROJECT_ID_LENGTH} characters`,
+  MISSING_CONFIG: 'Configuration is required',
+  MISSING_API_URL: 'API URL is required',
   INVALID_SESSION_TIMEOUT: `Session timeout must be between ${VALIDATION_CONSTANTS.MIN_SESSION_TIMEOUT}ms (1 minute) and ${VALIDATION_CONSTANTS.MAX_SESSION_TIMEOUT}ms (24 hours)`,
   INVALID_SAMPLING_RATE: `Sampling rate must be between ${VALIDATION_CONSTANTS.MIN_SAMPLING_RATE} and ${VALIDATION_CONSTANTS.MAX_SAMPLING_RATE}`,
   INVALID_GOOGLE_ANALYTICS_ID: 'Google Analytics measurement ID is required when integration is enabled',
@@ -28,17 +28,13 @@ const VALIDATION_MESSAGES = {
  * @param config - The app configuration to validate
  * @throws {Error} If validation fails
  */
-export const validateAppConfig = (config: AppConfig): void => {
-  if (!config.id) {
-    throw new Error(VALIDATION_MESSAGES.MISSING_PROJECT_ID);
+export const validateAppConfig = (config: Config): void => {
+  if (!config) {
+    throw new Error(VALIDATION_MESSAGES.MISSING_CONFIG);
   }
 
-  if (
-    typeof config.id !== 'string' ||
-    config.id.length < VALIDATION_CONSTANTS.MIN_PROJECT_ID_LENGTH ||
-    config.id.length > VALIDATION_CONSTANTS.MAX_PROJECT_ID_LENGTH
-  ) {
-    throw new Error(VALIDATION_MESSAGES.INVALID_PROJECT_ID);
+  if (!['demo', 'test'].includes(config.mode) && !config.apiUrl) {
+    throw new Error(VALIDATION_MESSAGES.MISSING_API_URL);
   }
 
   if (config.sessionTimeout !== undefined) {
@@ -104,7 +100,7 @@ const validateScrollContainerSelectors = (selectors: string | string[]): void =>
  * Validates integrations configuration
  * @param integrations - Integrations configuration to validate
  */
-const validateIntegrations = (integrations: AppConfig['integrations']): void => {
+const validateIntegrations = (integrations: Config['integrations']): void => {
   if (!integrations) return;
 
   if (integrations.googleAnalytics) {
@@ -129,12 +125,14 @@ const validateIntegrations = (integrations: AppConfig['integrations']): void => 
  * @param config - The app configuration to validate and normalize
  * @returns The normalized configuration
  */
-export const validateAndNormalizeConfig = (config: AppConfig): AppConfig => {
+export const validateAndNormalizeConfig = (config: Config): Config => {
   validateAppConfig(config);
+
+  const mode = config.mode?.trim() || 'default';
 
   return {
     ...config,
-    id: config.id.trim(),
+    mode: (['demo', 'test'].includes(mode) ? mode : 'default') as Config['mode'],
     sessionTimeout: config.sessionTimeout ?? SESSION_TIMEOUT_MS,
     globalMetadata: config.globalMetadata ?? {},
     sensitiveQueryParams: config.sensitiveQueryParams ?? [],
@@ -217,16 +215,14 @@ export const validateConfig = (config: Config): { errors: string[]; warnings: st
     }
   }
 
-  // No custom API endpoints supported
+  if (config.apiUrl && !/^https?:\/\//.test(config.apiUrl)) {
+    errors.push('apiUrl must start with http:// or https://');
+  }
 
   validateSamplingRate(config.samplingRate, errors);
 
   if (config.qaMode !== undefined && typeof config.qaMode !== 'boolean') {
     errors.push('qaMode must be a boolean');
-  }
-
-  if (config.tags !== undefined && !Array.isArray(config.tags)) {
-    errors.push('tags must be an array');
   }
 
   validateExcludedUrlPaths(config.excludedUrlPaths, errors);
@@ -245,35 +241,6 @@ export const validateFinalConfig = (config: Config): { errors: string[]; warning
 
   validateSamplingRate(config.samplingRate, errors);
   validateExcludedUrlPaths(config.excludedUrlPaths, errors);
-  // No custom API endpoints supported
 
   return { errors, warnings };
-};
-
-/**
- * Type guard to check if a JSON response is a valid API config
- * @param json - The JSON to validate
- * @returns True if the JSON is a valid API config
- */
-export const isValidConfigApiResponse = (json: unknown): json is ApiConfig => {
-  try {
-    if (typeof json !== 'object' || !json) {
-      return false;
-    }
-
-    const response = json as Record<string, unknown>;
-
-    const result: Record<keyof ApiConfig, boolean> = {
-      qaMode: response['qaMode'] === undefined || typeof response['qaMode'] === 'boolean',
-      samplingRate:
-        response['samplingRate'] === undefined ||
-        (typeof response['samplingRate'] === 'number' && response['samplingRate'] > 0 && response['samplingRate'] <= 1),
-      tags: response['tags'] === undefined || Array.isArray(response['tags']),
-      excludedUrlPaths: response['excludedUrlPaths'] === undefined || Array.isArray(response['excludedUrlPaths']),
-    };
-
-    return Object.values(result).every(Boolean);
-  } catch {
-    return false;
-  }
 };

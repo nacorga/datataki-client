@@ -24,13 +24,9 @@ export class App extends StateManager {
   private scrollHandler!: ScrollHandler;
   private suppressNextScrollTimer: ReturnType<typeof setTimeout> | null = null;
 
-  async init(config: Config): Promise<void> {
+  init(config: Config): void {
     if (this.isInitialized) {
       return;
-    }
-
-    if (!config || !config.apiUrl) {
-      throw new Error('Configuration is required and must include apiUrl.');
     }
 
     try {
@@ -87,7 +83,13 @@ export class App extends StateManager {
   }
 
   private setConfig(config: Config): void {
-    this.set('config', config);
+    this.set('config', {
+      ...config,
+      ...(['test', 'demo'].includes(config.mode) && {
+        qaMode: true,
+        samplingRate: 1,
+      }),
+    });
   }
 
   private setUserId(): void {

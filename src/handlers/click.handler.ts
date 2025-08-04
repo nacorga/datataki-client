@@ -2,7 +2,7 @@ import { EventManager } from '../managers/event.manager';
 import { StateManager } from '../managers/state.manager';
 import { ClickCoordinates, ClickData, ClickTrackingElementData, EventType } from '../types/event.types';
 
-const HTML_DATA_ATTR_PREFIX = 'data-tl';
+const HTML_DATA_ATTR_PREFIX = 'data-taki';
 const MAX_TEXT_LENGTH = 255;
 const INTERACTIVE_SELECTORS = [
   'button',

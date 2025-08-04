@@ -90,11 +90,11 @@ export const isScrollDirection = (value: unknown): value is ScrollDirection => {
 };
 
 /**
- * Type guard to check if a value is a valid TraceLog event
+ * Type guard to check if a value is a valid Datataki event
  * @param value - Value to check
- * @returns True if the value is a valid TraceLog event
+ * @returns True if the value is a valid Datataki event
  */
-export const isTracelogEvent = (value: unknown): value is EventData => {
+export const isDatatakiEvent = (value: unknown): value is EventData => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -158,11 +158,11 @@ export const isTracelogEvent = (value: unknown): value is EventData => {
 };
 
 /**
- * Type guard to check if a value is a valid TraceLog queue
+ * Type guard to check if a value is a valid Datataki queue
  * @param value - Value to check
- * @returns True if the value is a valid TraceLog queue
+ * @returns True if the value is a valid Datataki queue
  */
-export const isTracelogQueue = (value: unknown): value is Queue => {
+export const isDatatakiQueue = (value: unknown): value is Queue => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -177,7 +177,7 @@ export const isTracelogQueue = (value: unknown): value is Queue => {
     return false;
   }
 
-  if (!queue.events.every((event) => isTracelogEvent(event))) {
+  if (!queue.events.every((event) => isDatatakiEvent(event))) {
     return false;
   }
 

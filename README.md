@@ -1,324 +1,235 @@
-# Datataki
+# Datataki Client
 
-A lightweight client-side event tracking library for web applications. Track user sessions, page views, interactions and custom events with minimal setup.
+[![npm version](https://badge.fury.io/js/%40datataki%2Fclient.svg)](https://badge.fury.io/js/%40datataki%2Fclient)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A lightweight, privacy-focused client-side event tracking library for modern web applications. Track user sessions, page views, interactions and custom events with minimal setup and zero dependencies.
 
 ![Cover](./assets/cover.png)
 
-## Features
+## ✨ Features
 
-- 🔄 Automatic session tracking
-- 📊 Page view tracking 
-- 🖱️ Click tracking with custom data attributes
-- 📜 Scroll depth and direction tracking
-- ✨ Custom events support
-- 📱 Device type detection
-- 🔍 UTM parameter tracking
-- 🔒 Privacy-focused (no cookies, local storage only)
-- 📦 Batch processing for optimal performance
-- ⚡ Real-time event dispatching option
-- 🐛 Debug mode
+- 🔄 **Automatic tracking**: Sessions, page views, clicks, and scroll events
+- ✨ **Custom events** with validation and rich metadata support
+- 📱 **Device & UTM detection** for comprehensive analytics
+- 🔒 **Privacy-focused**: No cookies, localStorage only
+- 📦 **Performance optimized**: Batching, debouncing, < 15KB
+- 🛡️ **TypeScript ready** with full type definitions
 
-## Installation
+## 📦 Installation
 
 ```bash
-npm install @datataki/sdk
+npm install @datataki/client
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-```javascript
-import { startTracking, sendCustomEvent } from '@datataki/sdk';
+### ES Modules / TypeScript
+```typescript
+import { Datataki } from '@datataki/client';
 
 // Initialize tracking
-startTracking('YOUR_API_URL', {
-  debug: false,
-  realTime: true,
-  realTimeNamespace: 'analytics',
-  sessionTimeout: 1800000,
-  excludeRoutes: ['/admin/*', '/login'],
-  samplingRate: 0.5,
+Datataki.init({
+  apiUrl: 'https://your-api-endpoint.com',
+  mode: 'default',
+  sessionTimeout: 900000, // 15 minutes
+  samplingRate: 1.0,
   globalMetadata: {
-    appVersion: '1.0.1',
-    environment: 'production',
-  },
+    appVersion: '1.0.0',
+    environment: 'production'
+  }
 });
 
 // Send custom event
-sendCustomEvent('button_click', {
-  buttonId: 'submit-form',
-  category: 'form',
-  isValid: true,
-  tags: ['registration', 'user']
+Datataki.event('user_signup', {
+  method: 'email',
+  plan: 'premium',
+  source: 'landing_page'
 });
 ```
 
-## Configuration
-
-The `startTracking` function accepts these configuration options:
-
+### CommonJS
 ```javascript
-interface DatatakiConfig {
-  debug?: boolean; // Enable console logging
-  realTime?: boolean; // Enable real-time event dispatching (events exposed to all scripts)
-  realTimeNamespace?: string; // Custom namespace for real-time events
-  sessionTimeout?: number; // Inactivity timeout in ms (default: 15m, minimum: 30s)
-  samplingRate?: number; // Allow to track only a percentage of users (default: 1, range: 0-1)
-  excludeRoutes?: Array<string | RegExp>; // List of routes (exact, wildcard with *, or RegExp) not to track
-  globalMetadata?: Record<string, string | number | boolean | string[]>; // Include global metadata to be sent with all events
-}
+const { Datataki } = require('@datataki/client');
+Datataki.init({ apiUrl: 'https://your-api-endpoint.com' });
 ```
 
-### Configuration Validation
+### Browser CDN
+```html
+<script src="https://unpkg.com/@datataki/client/dist/browser/app.js"></script>
+<script>
+  Datataki.init({ apiUrl: 'https://your-api-endpoint.com' });
+</script>
+```
 
-The library performs the following validations on configuration:
+## ⚙️ Configuration
 
-- `sessionTimeout` must be at least 30 seconds
-- `samplingRate` must be a number between 0 and 1
-- `globalMetadata` is validated for each event (max 12 keys, max 10KB size, early size check)
-
-### Route Exclusion
-
-The `excludeRoutes` option allows you to specify routes where certain events should not be tracked:
-
-```javascript
-startTracking('YOUR_API_URL', {
-  excludeRoutes: [
-    '/admin', // Exact path match
-    /^\/private/, // Regex pattern match
-  ]
+```typescript
+Datataki.init({
+  apiUrl: string; // Required: API endpoint where events will be sent
+  mode?: 'demo' | 'test' | 'default'; // Default: 'default'
+  qaMode?: boolean; // Enable debug logging
+  samplingRate?: number; // 0-1, default: 1.0
+  sessionTimeout?: number; // Default: 900000 (15min)
+  excludedUrlPaths?: string[]; // Routes to exclude
+  globalMetadata?: Record<string, MetadataType>;
+  allowHttp?: boolean; // For development
+  sensitiveQueryParams?: string[]; // Remove from URLs
+  integrations?: {
+    googleAnalytics?: { measurementId: string };
+  };
 });
 ```
 
-When a route is excluded:
-- Scroll events are not tracked
-- Click events are not tracked
-- Other events (page views, custom events, session events) are still tracked
+### Examples
 
-#### Route Exclusion Behavior
-
-The library supports three types of route exclusion patterns:
-
-1. **Exact String Match**
-   ```javascript
-   excludeRoutes: ['/admin', '/login']
-   ```
-   - `/admin` → excluded
-   - `/admin/settings` → not excluded (doesn't match exactly)
-   - `/login` → excluded
-
-2. **Wildcard String Match**
-   ```javascript
-   excludeRoutes: ['/admin/*', '/account/*/settings']
-   ```
-   - `/admin` → excluded
-   - `/admin/settings` → excluded
-   - `/account/123/settings` → excluded
-   - `/account/123/profile` → not excluded
-
-3. **Regular Expression Match**
-   ```javascript
-   excludeRoutes: [/^\/private/, /^\/t.*/]
-   ```
-   - `/private` → excluded
-   - `/private/area` → excluded (matches regex)
-   - `/test` → excluded (matches /^\/t.*/)
-   - `/taki` → excluded (matches /^\/t.*/)
-   - `/user` → not excluded (doesn't match regex)
-
-Important notes:
-- Wildcards using `*` are supported in string patterns
-- Routes are matched against the pathname only (query parameters are ignored)
-- The matching is case-sensitive
-- Empty array or undefined means no routes are excluded
-
-This is useful for:
-- Excluding admin/private areas from analytics
-- Reducing noise in high-traffic areas
-- Complying with privacy requirements for sensitive pages
-
-## Automatic Events
-
-Datataki automatically tracks these events:
-
-### Session Events
-- `SESSION_START`: When a new session begins
-  - Includes UTM parameters if present
-  - Includes referrer information
-  - Includes device type
-- `SESSION_END`: When session ends due to inactivity or page close
-
-After the configured `sessionTimeout` elapses, a `SESSION_END` event is fired. The next interaction starts a new session with a new session ID, while the user ID stored in `localStorage` remains to link sessions from the same visitor.
-
-### Page Events
-- `PAGE_VIEW`: On initial load and navigation changes
-  - Tracks both direct navigation and history API changes
-  - Includes previous page URL when navigating
-- `SCROLL`: Records scroll depth and direction
-  - Debounced to prevent excessive events
-  - Includes relative position (0-100%)
-- `CLICK`: Captures click events with element details
-  - Includes relative coordinates within element
-  - Supports custom data attributes
-
-### Click Events
-
-Datataki tracks clicks in two ways:
-
-#### 1. Basic Click Events
-Every click on your website is automatically tracked with basic information:
-
-```javascript
-{
-  element: 'button', // HTML element type
-  x: number, // X coordinate
-  y: number, // Y coordinate
-  id?: 'signup_btn', // Element ID (if present)
-  class?: 'btn' // Element class (if present)
-}
+**Basic:**
+```typescript
+Datataki.init({
+  apiUrl: 'https://analytics.yourapi.com/events'
+});
 ```
 
-#### 2. Custom Click Events
-To send a custom event when clicking an element, add the `data-taki-name` attribute. You can also include `data-taki-value` to add additional metadata:
+**Production:**
+```typescript
+Datataki.init({
+  apiUrl: 'https://analytics.yourapi.com/events',
+  samplingRate: 0.8,
+  excludedUrlPaths: ['/admin/*', '/private/*'],
+  globalMetadata: {
+    appVersion: '2.1.0',
+    environment: 'production'
+  }
+});
+```
+
+### URL Path Exclusion
+
+Exclude routes from scroll/click tracking:
+
+```typescript
+excludedUrlPaths: [
+  '/admin', // Exact match
+  '/admin/*', // Wildcard match  
+  '/private/*' // All private routes
+]
+```
+
+## 📊 Event Tracking
+
+Datataki automatically tracks:
+- **Sessions** (`SESSION_START`/`SESSION_END`) with UTM parameters
+- **Page views** (`PAGE_VIEW`) including SPA navigation  
+- **Clicks** (`CLICK`) with element details and coordinates
+- **Scroll events** (`SCROLL`) with depth percentage and direction
+
+### Enhanced Click Tracking
+
+Use `data-tl-name` and `data-tl-value` for custom click events:
 
 ```html
-<!-- Basic usage -->
-<button data-taki-name="signup_button">Sign Up</button>
-
-<!-- With additional metadata -->
-<button 
-  data-taki-name="signup_button"
-  data-taki-value="premium_plan">
-  Sign Up Premium
+<button data-tl-name="signup_cta" data-tl-value="premium">
+  Start Free Trial
 </button>
 ```
 
-When clicking these buttons, Datataki will:
-1. Send the basic click event (as shown above)
-2. Send a custom event with:
-
+This sends both a standard click event and a custom event:
 ```javascript
-{
-  name: 'signup_button',
-  metadata: {
-    value: 'premium_plan' // Only included if data-taki-value is present
-  }
-}
+{ type: 'CUSTOM', name: 'signup_cta', metadata: { value: 'premium' } }
 ```
 
-## Custom Events
+## 🎨 Custom Events
 
-Send custom events with metadata:
+Send business events with the `event()` method:
 
-```javascript
-sendCustomEvent('purchase_completed', {
-  productId: '123',
+```typescript
+// Simple event
+Datataki.event('user_signup');
+
+// With metadata
+Datataki.event('purchase_completed', {
+  productId: 'prod_123',
   price: 99.99,
-  categories: ['electronics', 'phones']
+  categories: ['electronics', 'phones'],
+  isFirstPurchase: true
 });
 ```
 
-### Event Validation
+### Validation Limits
+- Event name: 120 characters max
+- Metadata: 8KB total, 10 keys max, 10 array items max
+- Valid types: `string`, `number`, `boolean`, `string[]`
 
-The library performs strict validation on custom events:
+## � Data & Performance
 
-- Event name: max 120 characters
-- Metadata object: max 10KB
-- Max 12 metadata keys
-- Arrays: max 12 items
-- Valid types: string, number, boolean, string[]
-- Objects are size-checked during traversal before serialization
-- Invalid events will be logged to console in debug mode
+**Automatic Detection:**
+- Device type: `mobile`, `tablet`, `desktop`
+- UTM parameters for marketing attribution
 
-Example of valid metadata:
-```javascript
-{
-  productId: '123', // string
-  price: 99.99, // number
-  isAvailable: true, // boolean
-  tags: ['electronics', 'phones'] // string[]
-}
+**Smart Processing:**
+- Events batched every 10 seconds (500 event queue limit)
+- Uses `sendBeacon` with `fetch` fallback
+- Exponential backoff retry on failures
+- < 15KB bundle size, zero dependencies
+
+## 🔒 Privacy & Security
+
+- **No cookies**: localStorage only for user identification
+- **HTTPS enforced**: HTTP blocked by default (except development)
+- **Data validation**: All inputs sanitized and size-limited
+- **Configurable exclusions**: Remove sensitive routes/parameters
+
+## 🔧 Advanced Usage
+
+### TypeScript Support
+```typescript
+import { Datataki, Config, MetadataType } from '@datataki/client';
+
+const config: Config = {
+  apiUrl: 'https://api.example.com/events',
+  globalMetadata: {
+    version: '1.0.0',
+    debugMode: false
+  }
+};
+
+Datataki.init(config);
+Datataki.event('purchase', { productId: 'prod_123', price: 99.99 });
 ```
 
-## Event Payload
-
-All events include:
-```javascript
-{
-  type: EventType;
-  page_url: string;
-  timestamp: number;
-  // Event specific data...
-}
+### Lifecycle Management
+```typescript
+// Cleanup when done
+Datataki.destroy();
 ```
 
-## Device Detection
-
-Datataki automatically detects device type:
-- `mobile`
-- `tablet` 
-- `desktop`
-
-## UTM Parameter Tracking
-
-The library automatically captures UTM parameters:
-- utm_source
-- utm_medium
-- utm_campaign
-- utm_term
-- utm_content
-
-These are included in the `SESSION_START` event.
-
-## Event Processing
-
-### Batch Processing
-Events are collected in a queue and sent in batches every 10 seconds to optimize network usage and reduce server load. Up to **1000** events are kept in the queue; when the limit is exceeded the oldest entries are discarded. The batch includes:
-
-```javascript
-{
-  user_id: string;
-  session_id: string;
-  device: DeviceType;
-  events: DatatakiEvent[];
-  debug_mode?: boolean;
-  global_metadata?: Record<string, MetadataType>;
-}
-```
-
-### Real-time Events
-When `realTime: true` is enabled, events are also dispatched immediately through a custom event. **This exposes event data to any script running on the page.** To limit who can listen, provide a `realTimeNamespace` so events are dispatched using a namespaced event name:
-
-```javascript
-window.addEventListener('DatatakiEvent:analytics', (e: CustomEvent) => {
-  const event = e.detail.event;
-  console.log('Real-time event:', event);
+### Development Mode
+```typescript
+Datataki.init({
+  apiUrl: 'http://localhost:3000/events',
+  mode: 'test',
+  qaMode: true,  // Enable debug logging
+  allowHttp: true
 });
 ```
 
-Set the namespace when initializing:
+## 🤝 Contributing
 
-```javascript
-startTracking('YOUR_API_URL', { realTime: true, realTimeNamespace: 'analytics' });
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+```bash
+git clone https://github.com/nacorga/datataki-client.git
+npm install
+npm run build:all
+npm run test:e2e
 ```
 
-### Error Handling
-- Invalid events are logged to console in debug mode.
-- Failed event submissions are retried in the next batch. When multiple failures occur the retry delay increases exponentially up to one minute.
-- Network errors are handled gracefully with fallback to fetch if sendBeacon fails.
+## 📄 License
 
-## Browser Support
-- Modern browsers with ES6+ support
-- Requires localStorage API
-- Uses modern APIs like sendBeacon with fetch fallback
-- No IE11 support
+MIT License - see [LICENSE](LICENSE) file for details.
 
-## Privacy & Performance
-- No cookies used, only localStorage for user identification
-- Events are batched to reduce network requests
-- Sampling rate support to reduce data volume
-- Route exclusion for privacy-sensitive areas
-- Sessions automatically end after inactivity while the user ID remains stored in `localStorage`
+## 🔗 Links
 
-## License
-
-MIT 
+- **GitHub**: [nacorga/datataki](https://github.com/nacorga/datataki-client)
+- **npm**: [@datataki/client](https://www.npmjs.com/package/@datataki/client)
+- **Issues**: [Bug reports & features](https://github.com/nacorga/datataki-client/issues)

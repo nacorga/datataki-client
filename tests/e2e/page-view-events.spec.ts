@@ -6,7 +6,7 @@ test.describe('Page View Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -26,9 +26,9 @@ test.describe('Page View Events - Demo Mode', () => {
     const pageViewLogs = consoleLogs.filter((log) => log.includes(`"type":"${EventType.PAGE_VIEW}"`));
 
     expect(pageViewLogs).toHaveLength(1);
-    expect(pageViewLogs[0]).toContain(`[TraceLog] ${EventType.PAGE_VIEW} event:`);
+    expect(pageViewLogs[0]).toContain(`[Datataki] ${EventType.PAGE_VIEW} event:`);
 
-    const eventData = pageViewLogs[0].split(`[TraceLog] ${EventType.PAGE_VIEW} event:`)[1];
+    const eventData = pageViewLogs[0].split(`[Datataki] ${EventType.PAGE_VIEW} event:`)[1];
     const parsed = JSON.parse(eventData);
 
     expect(parsed).toHaveProperty('type', EventType.PAGE_VIEW);

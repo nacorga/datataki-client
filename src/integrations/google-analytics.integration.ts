@@ -64,7 +64,7 @@ export class GoogleAnalyticsIntegration extends StateManager {
   cleanup(): void {
     this.isInitialized = false;
 
-    const script = document.getElementById('tracelog-ga-script');
+    const script = document.getElementById('datataki-ga-script');
 
     if (script) {
       script.remove();
@@ -72,14 +72,14 @@ export class GoogleAnalyticsIntegration extends StateManager {
   }
 
   private loadScript(measurementId: string): void {
-    if (document.getElementById('tracelog-ga-script')) {
+    if (document.getElementById('datataki-ga-script')) {
       return;
     }
 
     try {
       const script = document.createElement('script');
 
-      script.id = 'tracelog-ga-script';
+      script.id = 'datataki-ga-script';
       script.async = true;
       script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
 

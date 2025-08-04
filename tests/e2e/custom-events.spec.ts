@@ -6,7 +6,7 @@ test.describe('Custom Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -20,7 +20,7 @@ test.describe('Custom Events - Demo Mode', () => {
     const customLogs = consoleLogs.filter((log) => log.includes(`"type":"${EventType.CUSTOM}"`));
 
     expect(customLogs).toHaveLength(1);
-    expect(customLogs[0]).toContain(`[TraceLog] ${EventType.CUSTOM} event:`);
+    expect(customLogs[0]).toContain(`[Datataki] ${EventType.CUSTOM} event:`);
 
     const customEventLog = customLogs[0];
 

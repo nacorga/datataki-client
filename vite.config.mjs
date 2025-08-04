@@ -6,15 +6,15 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/public-api.ts'),
-      name: 'TraceLog',
-      fileName: 'tracelog',
+      name: 'Datataki',
+      fileName: 'datataki',
       formats: ['es'],
     },
     rollupOptions: {
       external: [],
       output: {
         format: 'es',
-        entryFileNames: 'tracelog.js',
+        entryFileNames: 'app.js',
         dir: 'dist/browser',
       },
     },

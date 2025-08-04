@@ -1,6 +1,6 @@
 {
-  "name": "@datataki/sdk",
-  "version": "1.2.4",
+  "name": "@datataki/client",
+  "version": "0.0.0",
   "license": "MIT",
   "description": "A lightweight client-side event tracking library for modern web applications. Track user sessions, page views, interactions and custom events with minimal setup.",
   "keywords": [
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nacorga/datataki.git"
+    "url": "https://github.com/nacorga/datataki-client.git"
   },
   "scripts": {
     "build": "npx tsc",
@@ -44,7 +44,7 @@
     "check": "npm run lint && npm run format:check",
     "fix": "npm run lint:fix && npm run format",
     "serve:test": "http-server tests/fixtures -p 3000 --cors",
-    "test:e2e": "npm run build:browser && cp dist/browser/tracelog.js tests/fixtures/tracelog.js && playwright test",
+    "test:e2e": "npm run build:browser && cp dist/browser/app.js tests/fixtures/app.js && playwright test",
     "rc:list": "node scripts/rc-manager.js list",
     "rc:cleanup": "node scripts/rc-manager.js cleanup",
     "rc:cleanup:all": "node scripts/rc-manager.js cleanup all",

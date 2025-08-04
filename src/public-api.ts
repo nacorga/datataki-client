@@ -1,1 +1,1 @@
-export * as TraceLog from './api';
+export * as Datataki from './api';

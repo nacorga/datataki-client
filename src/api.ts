@@ -11,7 +11,7 @@ let app: App | null = null;
 let isInitializing = false;
 
 /**
- * Initializes the tracelog app with the provided configuration.
+ * Initializes the datataki app with the provided configuration.
  * @param appConfig - The configuration object for the app
  * @throws {Error} If the app is already initialized or initialization is in progress
  * @example

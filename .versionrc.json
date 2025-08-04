@@ -12,9 +12,9 @@
     {"type": "chore", "section": "📦 Chores", "hidden": false},
     {"type": "revert", "section": "⏪ Reverts", "hidden": false}
   ],
-  "commitUrlFormat": "https://github.com/nacorga/tracelog-client/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/nacorga/tracelog-client/compare/{{previousTag}}...{{currentTag}}",
-  "issueUrlFormat": "https://github.com/nacorga/tracelog-client/issues/{{id}}",
+  "commitUrlFormat": "https://github.com/nacorga/datataki/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/nacorga/datataki/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/nacorga/datataki/issues/{{id}}",
   "skip": {
     "bump": false,
     "changelog": false,

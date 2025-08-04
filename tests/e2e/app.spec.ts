@@ -5,14 +5,14 @@ test.describe('App', () => {
     let appWorksLog: string | undefined = undefined;
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text() === 'TraceLog initialized successfully') {
+      if (msg.type() === 'log' && msg.text() === 'Datataki initialized successfully') {
         appWorksLog = msg.text();
       }
     });
 
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByTestId('title')).toContainText('TraceLog E2E Test Page');
+    await expect(page.getByTestId('title')).toContainText('Datataki E2E Test Page');
 
     expect(appWorksLog).toBeDefined()
   });

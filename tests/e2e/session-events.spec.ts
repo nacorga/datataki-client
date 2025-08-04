@@ -6,7 +6,7 @@ test.describe('Session Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -21,8 +21,8 @@ test.describe('Session Events - Demo Mode', () => {
     expect(sessionStartLogs).toHaveLength(1);
     expect(pageViewLogs).toHaveLength(1);
 
-    expect(sessionStartLogs[0]).toContain(`[TraceLog] ${EventType.SESSION_START} event:`);
-    expect(pageViewLogs[0]).toContain(`[TraceLog] ${EventType.PAGE_VIEW} event:`);
+    expect(sessionStartLogs[0]).toContain(`[Datataki] ${EventType.SESSION_START} event:`);
+    expect(pageViewLogs[0]).toContain(`[Datataki] ${EventType.PAGE_VIEW} event:`);
 
     const sessionStartEvent = sessionStartLogs[0];
 
@@ -42,7 +42,7 @@ test.describe('Session Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -56,7 +56,7 @@ test.describe('Session Events - Demo Mode', () => {
     const sessionEndLogs = consoleLogs.filter((log) => log.includes(`"type":"${EventType.SESSION_END}"`));
 
     expect(sessionEndLogs).toHaveLength(1);
-    expect(sessionEndLogs[0]).toContain(`[TraceLog] ${EventType.SESSION_END} event:`);
+    expect(sessionEndLogs[0]).toContain(`[Datataki] ${EventType.SESSION_END} event:`);
 
     const sessionEndEvent = sessionEndLogs[0];
 

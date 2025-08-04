@@ -8,7 +8,7 @@ test.describe('Queue Logging - Test Mode', () => {
     const eventLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
         
         if (msg.text().includes('Queue structure:')) {
@@ -121,7 +121,7 @@ test.describe('Queue Logging - Test Mode', () => {
     const queueTimestamps: number[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
         
         // Track when queue structures are logged (indicates queue send)
@@ -187,7 +187,7 @@ test.describe('Queue Logging - Test Mode', () => {
     const sessionPhases: { phase: string; timestamp: number; queueStructure?: any }[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });

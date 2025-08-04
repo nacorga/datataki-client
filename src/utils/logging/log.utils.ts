@@ -1,12 +1,12 @@
 import { LogType } from '../../types/log.types';
 
 /**
- * Builds a formatted log message with TraceLog prefix
+ * Builds a formatted log message with Datataki prefix
  * @param message - The message to format
  * @returns The formatted message
  */
 const buildMessage = (message: string): string => {
-  return `[TraceLog] ${message}`;
+  return `[Datataki] ${message}`;
 };
 
 /**

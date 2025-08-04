@@ -6,7 +6,7 @@ test.describe('Click Events - Demo Mode', () => {
     const consoleLogs: string[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
@@ -22,8 +22,8 @@ test.describe('Click Events - Demo Mode', () => {
     expect(clickLogs).toHaveLength(1);
     expect(customLogs).toHaveLength(1);
 
-    expect(clickLogs[0]).toContain(`[TraceLog] ${EventType.CLICK} event:`);
-    expect(customLogs[0]).toContain(`[TraceLog] ${EventType.CUSTOM} event:`);
+    expect(clickLogs[0]).toContain(`[Datataki] ${EventType.CLICK} event:`);
+    expect(customLogs[0]).toContain(`[Datataki] ${EventType.CUSTOM} event:`);
 
     const clickEvent = clickLogs[0];
 
@@ -40,12 +40,12 @@ test.describe('Click Events - Demo Mode', () => {
     expect(customEvent).toContain('"metadata"');
   });
 
-  test('should not throw when clicking element with empty data-tl-name', async ({ page }) => {
+  test('should not throw when clicking element with empty data-taki-name', async ({ page }) => {
     const consoleLogs: string[] = [];
     const pageErrors: Error[] = [];
 
     page.on('console', (msg) => {
-      if (msg.type() === 'log' && msg.text().includes('[TraceLog]')) {
+      if (msg.type() === 'log' && msg.text().includes('[Datataki]')) {
         consoleLogs.push(msg.text());
       }
     });
