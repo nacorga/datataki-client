@@ -184,9 +184,17 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
         id: get_tag
         run: |
-          TAG=$(git describe --tags --abbrev=0)
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Generated tag: $TAG"
+          # Try to get the latest tag, fallback to package.json version if no tags exist
+          if TAG=$(git describe --tags --abbrev=0 2>/dev/null); then
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+            echo "Found existing tag: $TAG"
+          else
+            # No tags found, use current version from package.json with 'v' prefix
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+            TAG="v$PACKAGE_VERSION"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+            echo "No existing tags found, using package.json version: $TAG"
+          fi
 
       - name: Create Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
