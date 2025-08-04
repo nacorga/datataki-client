@@ -1,4 +1,4 @@
-# Datataki Client
+# Datataki
 
 [![npm version](https://badge.fury.io/js/%40datataki%2Fclient.svg)](https://badge.fury.io/js/%40datataki%2Fclient)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

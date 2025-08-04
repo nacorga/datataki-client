@@ -224,44 +224,15 @@ jobs:
               releaseBody = `Release ${tag}`;
             }
             
-            // Check if release already exists
-            try {
-              const existingRelease = await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag: tag
-              });
-              
-              console.log(`Release ${tag} already exists, updating it...`);
-              
-              // Update existing release
-              await github.rest.repos.updateRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: existingRelease.data.id,
-                name: tag,
-                body: releaseBody || `Release ${tag}`,
-                draft: false,
-                prerelease: false
-              });
-              
-            } catch (error) {
-              if (error.status === 404) {
-                // Release doesn't exist, create it
-                console.log(`Creating new release ${tag}...`);
-                await github.rest.repos.createRelease({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  tag_name: tag,
-                  name: tag,
-                  body: releaseBody || `Release ${tag}`,
-                  draft: false,
-                  prerelease: false
-                });
-              } else {
-                throw error;
-              }
-            }
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: tag,
+              body: releaseBody || `Release ${tag}`,
+              draft: false,
+              prerelease: false
+            });
 
       - name: Build for production
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
