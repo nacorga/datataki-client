@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/%40datataki%2Fclient.svg)](https://badge.fury.io/js/%40datataki%2Fclient)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A lightweight, privacy-focused client-side event tracking library for modern web applications. Track user sessions, page views, interactions and custom events with minimal setup and zero dependencies.
+A lightweight client-side event tracking library for modern web applications. Track user sessions, page views, interactions and custom events with minimal setup and zero dependencies.
 
 ![Cover](./assets/cover.png)
 
