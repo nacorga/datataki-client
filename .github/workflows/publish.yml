@@ -242,18 +242,35 @@ jobs:
               prerelease: false
             });
 
-      - name: Build for production
+      - name: Check if version exists on NPM
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
+        id: check_npm_version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_NAME="@datataki/client"
+          
+          echo "Checking if version $CURRENT_VERSION exists on NPM..."
+          
+          if npm view $PACKAGE_NAME@$CURRENT_VERSION version 2>/dev/null; then
+            echo "version_exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Version $CURRENT_VERSION already exists on NPM, skipping publish"
+          else
+            echo "version_exists=false" >> $GITHUB_OUTPUT
+            echo "✅ Version $CURRENT_VERSION does not exist on NPM, proceeding with publish"
+          fi
+
+      - name: Build for production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success' && steps.check_npm_version.outputs.version_exists == 'false'
         run: npm run build-ugly
 
       - name: Publish to NPM
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success' && steps.check_npm_version.outputs.version_exists == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public
 
       - name: Clean up RC versions
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success' && steps.check_npm_version.outputs.version_exists == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
