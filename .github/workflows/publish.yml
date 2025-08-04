@@ -146,55 +146,82 @@ jobs:
             });
 
       # Production Release for main branch
-      - name: Get package version
+      - name: Check if release commit
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        id: package_version
+        id: check_release
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Package version: $VERSION"
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          if [[ "$COMMIT_MESSAGE" =~ \[skip\ ci\] ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "🔄 Skipping workflow for release commit"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "✅ Proceeding with release workflow"
+          fi
 
-      - name: Create Git Tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Configure Git
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false'
         run: |
-          VERSION=${{ steps.package_version.outputs.version }}
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
+
+      - name: Generate release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false'
+        id: bump_version
+        run: |
+          # Run standard-version without forcing patch
+          npx standard-version \
+            --releaseCommitMessageFormat "chore(release): {{currentTag}} [skip ci]" \
+            --no-verify \
+            --tag-prefix "v"
           
-          # Check if tag already exists
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
-            echo "⚠️ Tag v$VERSION already exists, skipping tag creation"
-            echo "tag_created=false" >> $GITHUB_OUTPUT
-          else
-            git tag -a "v$VERSION" -m "Release v$VERSION"
-            git push origin "v$VERSION"
-            echo "✅ Created and pushed tag v$VERSION"
-            echo "tag_created=true" >> $GITHUB_OUTPUT
-          fi
+          # Push the changes and tags
+          git push --follow-tags origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get latest tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Generated tag: $TAG"
+
       - name: Create Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
         uses: actions/github-script@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
-            const version = '${{ steps.package_version.outputs.version }}';
-            const tag = `v${version}`;
+            const tag = '${{ steps.get_tag.outputs.tag }}';
+            const fs = require('fs');
             
-            // Check if release already exists
+            // Read changelog content
+            let releaseBody = '';
             try {
-              await github.rest.repos.getRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag: tag
-              });
-              console.log(`⚠️ Release ${tag} already exists, skipping release creation`);
-              return;
+              const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+              // Extract content for the current version
+              const lines = changelog.split('\n');
+              let capturing = false;
+              let bodyLines = [];
+              
+              for (const line of lines) {
+                if (line.startsWith('## ') || line.startsWith('# ')) {
+                  if (capturing) break;
+                  if (line.includes(tag.replace('v', ''))) {
+                    capturing = true;
+                    continue;
+                  }
+                }
+                if (capturing && line.trim()) {
+                  bodyLines.push(line);
+                }
+              }
+              releaseBody = bodyLines.join('\n').trim();
             } catch (error) {
-              if (error.status !== 404) throw error;
+              releaseBody = `Release ${tag}`;
             }
             
             await github.rest.repos.createRelease({
@@ -202,36 +229,28 @@ jobs:
               repo: context.repo.repo,
               tag_name: tag,
               name: tag,
-              body: `Release ${tag}`,
+              body: releaseBody || `Release ${tag}`,
               draft: false,
               prerelease: false
             });
-            
-            console.log(`✅ Created release ${tag}`);
 
       - name: Build for production
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
         run: npm run build-ugly
 
       - name: Publish to NPM
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
+      - name: Clean up RC versions
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_release.outputs.skip == 'false' && steps.bump_version.outcome == 'success'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          VERSION=${{ steps.package_version.outputs.version }}
-          echo "📦 Publishing version $VERSION to NPM..."
-          
-          # Check if this is the first publication
-          if npm view @datataki/client@$VERSION version 2>/dev/null; then
-            echo "⚠️ Version $VERSION already exists on NPM, skipping publication"
-          else
-            # Try to get package info to see if it exists at all
-            if npm view @datataki/client versions --json 2>/dev/null; then
-              echo "📦 Package exists, publishing new version..."
-              npm publish --access public
-            else
-              echo "🎉 First publication of the package!"
-              npm publish --access public
-            fi
-            echo "✅ Published version $VERSION to NPM"
-          fi
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "🧹 Cleaning up ALL RC versions for new release..."
+          node scripts/rc-manager.js cleanup all || echo "No RC versions to clean"
+          npm dist-tag add @datataki/client@$CURRENT_VERSION latest
+          echo "✅ Published version $CURRENT_VERSION as latest"
