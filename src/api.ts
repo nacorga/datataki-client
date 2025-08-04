@@ -17,10 +17,14 @@ let isInitializing = false;
  * @example
  * await init({ id: 'my-project-id' });
  */
-export const init = (config: Config): void => {
+export const init = async (appConfig: Config): Promise<void> => {
   try {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('This library can only be used in a browser environment');
+    }
+
     if (app) {
-      throw new Error('App is already initialized. Call getApp() to get the existing instance.');
+      return;
     }
 
     if (isInitializing) {
@@ -29,17 +33,16 @@ export const init = (config: Config): void => {
 
     isInitializing = true;
 
-    const validatedConfig = validateAndNormalizeConfig(config);
+    const validatedConfig = validateAndNormalizeConfig(appConfig);
     const instance = new App();
 
-    instance.init(validatedConfig);
+    await instance.init(validatedConfig);
 
     app = instance;
   } catch (error) {
     app = null;
 
     log('error', `Initialization failed: ${error instanceof Error ? error.message : String(error)}`);
-    throw error;
   } finally {
     isInitializing = false;
   }
