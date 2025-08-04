@@ -76,7 +76,9 @@ Datataki.init({
   allowHttp?: boolean; // For development
   sensitiveQueryParams?: string[]; // Remove from URLs
   integrations?: {
-    googleAnalytics?: { measurementId: string };
+    googleAnalytics?: {
+      measurementId: string
+    };
   };
 });
 ```
@@ -115,7 +117,7 @@ excludedUrlPaths: [
 ]
 ```
 
-## 📊 Event Tracking
+## 💻 Event Tracking
 
 Datataki automatically tracks:
 - **Sessions** (`SESSION_START`/`SESSION_END`) with UTM parameters
@@ -160,7 +162,7 @@ Datataki.event('purchase_completed', {
 - Metadata: 8KB total, 10 keys max, 10 array items max
 - Valid types: `string`, `number`, `boolean`, `string[]`
 
-## � Data & Performance
+## 📊 Data & Performance
 
 **Automatic Detection:**
 - Device type: `mobile`, `tablet`, `desktop`
