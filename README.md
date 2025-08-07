@@ -67,7 +67,7 @@ Datataki.init({ apiUrl: 'https://your-api-endpoint.com' });
 ```typescript
 Datataki.init({
   apiUrl: string; // Required: API endpoint where events will be sent
-  mode?: 'demo' | 'test' | 'default'; // Default: 'default'
+  mode?: 'demo' | 'test' | 'real_time' | 'default'; // Default: 'default'
   qaMode?: boolean; // Enable debug logging
   samplingRate?: number; // 0-1, default: 1.0
   sessionTimeout?: number; // Default: 900000 (15min)

@@ -27,6 +27,9 @@ export const DEFAULT_SAMPLING_RATE = 1;
 // UTM parameters
 export const UTM_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
+// Dispatch event name
+export const DISPATCH_EVENT_NAME = 'datataki:track';
+
 // Default config
 export const DEFAULT_CONFIG: Omit<Config, 'apiUrl'> = {
   mode: 'default',

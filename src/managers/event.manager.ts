@@ -1,4 +1,9 @@
-import { EVENT_SENT_INTERVAL, EVENT_SENT_INTERVAL_TEST, MAX_EVENTS_QUEUE_LENGTH } from '../app.constants';
+import {
+  DISPATCH_EVENT_NAME,
+  EVENT_SENT_INTERVAL,
+  EVENT_SENT_INTERVAL_TEST,
+  MAX_EVENTS_QUEUE_LENGTH,
+} from '../app.constants';
 import { CustomEventData, EventData, EventType } from '../types/event.types';
 import { Queue } from '../types/queue.types';
 import { SenderManager } from './sender.manager';
@@ -78,12 +83,12 @@ export class EventManager extends StateManager {
   }
 
   private processAndSend(payload: EventData): void {
+    if (this.get('config')?.mode === 'real_time') {
+      window.dispatchEvent(new CustomEvent(DISPATCH_EVENT_NAME, { detail: payload }));
+    }
+
     if (this.get('config')?.qaMode) {
       log('info', `${payload.type} event: ${JSON.stringify(payload)}`);
-
-      if (this.googleAnalytics && payload.type === EventType.CUSTOM) {
-        log('info', `Google Analytics event: ${JSON.stringify(payload)}`);
-      }
     }
 
     this.eventsQueue.push(payload);
@@ -103,6 +108,14 @@ export class EventManager extends StateManager {
     if (this.googleAnalytics && payload.type === EventType.CUSTOM) {
       const customEvent = payload.custom_event as CustomEventData;
 
+      this.trackGoogleAnalyticsEvent(customEvent);
+    }
+  }
+
+  private trackGoogleAnalyticsEvent(customEvent: CustomEventData): void {
+    if (this.get('config').qaMode) {
+      log('info', `Google Analytics event: ${JSON.stringify(customEvent)}`);
+    } else if (this.googleAnalytics) {
       this.googleAnalytics.trackEvent(customEvent.name, customEvent.metadata ?? {});
     }
   }

@@ -11,10 +11,11 @@ export interface Config {
    * Can be 'demo', 'test', or 'default'.
    * - 'demo': Used for demonstration purposes, may have limited functionality.
    * - 'test': Used for testing and debugging, may include additional logging or features.
+   * - 'real_time': Used for emitting real-time events.
    * - 'default': Normal operation mode with full functionality.
    * @default 'default'
    */
-  mode: 'demo' | 'test' | 'default';
+  mode: 'demo' | 'test' | 'real_time' | 'default';
   /**
    * Enables QA mode for testing and debugging purposes.
    * When enabled, events may be processed differently for development environments.

@@ -83,13 +83,7 @@ export class App extends StateManager {
   }
 
   private setConfig(config: Config): void {
-    this.set('config', {
-      ...config,
-      ...(['test', 'demo'].includes(config.mode) && {
-        qaMode: true,
-        samplingRate: 1,
-      }),
-    });
+    this.set('config', config);
   }
 
   private setUserId(): void {

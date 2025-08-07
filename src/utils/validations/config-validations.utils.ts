@@ -33,7 +33,7 @@ export const validateAppConfig = (config: Config): void => {
     throw new Error(VALIDATION_MESSAGES.MISSING_CONFIG);
   }
 
-  if (!['demo', 'test'].includes(config.mode) && !config.apiUrl) {
+  if (!['demo', 'test', 'real_time'].includes(config.mode) && !config.apiUrl) {
     throw new Error(VALIDATION_MESSAGES.MISSING_API_URL);
   }
 
@@ -132,10 +132,13 @@ export const validateAndNormalizeConfig = (config: Config): Config => {
 
   return {
     ...config,
-    mode: (['demo', 'test'].includes(mode) ? mode : 'default') as Config['mode'],
+    mode: (['demo', 'test', 'real_time'].includes(mode) ? mode : 'default') as Config['mode'],
     sessionTimeout: config.sessionTimeout ?? SESSION_TIMEOUT_MS,
     globalMetadata: config.globalMetadata ?? {},
     sensitiveQueryParams: config.sensitiveQueryParams ?? [],
+    ...(['test', 'demo', 'real_time'].includes(mode) && {
+      samplingRate: 1,
+    }),
   };
 };
 

@@ -26,9 +26,13 @@ export class SenderManager extends StateManager {
   }
 
   sendEventsQueue(body: Queue): boolean {
-    if (this.get('config')?.qaMode) {
-      this.logQueue(body);
+    const isQAMode = this.get('config')?.qaMode;
 
+    if (isQAMode) {
+      this.logQueue(body);
+    }
+
+    if (isQAMode || ['demo', 'test', 'real_time'].includes(this.get('config').mode)) {
       return true;
     }
 
