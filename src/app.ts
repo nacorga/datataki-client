@@ -1,4 +1,4 @@
-import { SCROLL_DEBOUNCE_TIME } from './app.constants';
+import { SCROLL_DEBOUNCE_TIME_MS } from './constants';
 import { EventManager } from './managers/event.manager';
 import { UserManager } from './managers/user.manager';
 import { StateManager } from './managers/state.manager';
@@ -147,7 +147,7 @@ export class App extends StateManager {
 
     this.suppressNextScrollTimer = setTimeout(() => {
       this.set('suppressNextScroll', false);
-    }, SCROLL_DEBOUNCE_TIME * 2);
+    }, SCROLL_DEBOUNCE_TIME_MS * 2);
   }
 
   private initClickHandler(): void {

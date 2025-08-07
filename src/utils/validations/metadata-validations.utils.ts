@@ -3,7 +3,7 @@ import {
   MAX_CUSTOM_EVENT_KEYS,
   MAX_CUSTOM_EVENT_NAME_LENGTH,
   MAX_CUSTOM_EVENT_STRING_SIZE,
-} from '../../app.constants';
+} from '../../constants';
 import { MetadataType } from '../../types/common.types';
 import { sanitizeMetadata } from '../security/sanitize.utils';
 import { isOnlyPrimitiveFields } from './type-guards.utils';

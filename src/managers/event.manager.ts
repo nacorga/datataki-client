@@ -1,16 +1,15 @@
 import {
   DISPATCH_EVENT_NAME,
-  EVENT_SENT_INTERVAL,
-  EVENT_SENT_INTERVAL_TEST,
+  EVENT_SENT_INTERVAL_MS,
+  EVENT_SENT_INTERVAL_TEST_MS,
   MAX_EVENTS_QUEUE_LENGTH,
-} from '../app.constants';
-import { CustomEventData, EventData, EventType } from '../types/event.types';
-import { Queue } from '../types/queue.types';
+} from '../constants';
+import { CustomEventData, EventData, EventType, Queue } from '../types';
+import { getUTMParameters, isUrlPathExcluded, log } from '../utils';
 import { SenderManager } from './sender.manager';
 import { SamplingManager } from './sampling.manager';
 import { StateManager } from './state.manager';
 import { GoogleAnalyticsIntegration } from '../integrations/google-analytics.integration';
-import { getUTMParameters, isUrlPathExcluded, log } from '../utils';
 import { StorageManager } from './storage.manager';
 
 export class EventManager extends StateManager {
@@ -125,7 +124,7 @@ export class EventManager extends StateManager {
       return;
     }
 
-    const interval = this.get('config')?.mode === 'test' ? EVENT_SENT_INTERVAL_TEST : EVENT_SENT_INTERVAL;
+    const interval = this.get('config')?.mode === 'test' ? EVENT_SENT_INTERVAL_TEST_MS : EVENT_SENT_INTERVAL_MS;
 
     this.eventsQueueIntervalId = window.setInterval(() => {
       if (this.eventsQueue.length > 0) {
